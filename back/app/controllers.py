@@ -23,7 +23,7 @@ def login_controller(login: LoginDTO):
     
     return pessoa
 
-@router.post("/pessoa/", response_model=PessoaDTO)
+@router.post("/cadastro_usuario/", response_model=PessoaDTO)
 def cadastrar_pessoa_controller(pessoa: Pessoa):
     pessoa = cadastrar_pessoa(pessoa)
 
