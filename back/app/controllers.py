@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
-from app.DTOs import LoginDTO, PessoaDTO
+from app.DTOs import LoginDTO, PessoaDTO, ReservaDTO
 from app.models import Pessoa
-from app.services import cadastrar_pessoa, get_pessoa, login_service
+from app.services import cadastrar_pessoa, get_pessoa, get_reserva, login_service
 from pydantic import BaseModel, Field
+from typing import Dict
 
 router = APIRouter()
 
@@ -31,3 +32,16 @@ def cadastrar_pessoa_controller(pessoa: Pessoa):
         raise HTTPException(status_code=404, detail="User not found")
     
     return pessoa
+
+""" ROTA RESERVA """
+@router.get("/reservas/{id_reserva}", response_model=ReservaDTO)
+def read_reserva(id_reserva: int):
+    reserva = get_reserva(id_reserva)
+    if reserva is None:
+        raise HTTPException(status_code=404, detail="Reserva não encontrada")
+    return reserva
+
+@router.post("/reservas/", response_model=int)
+def create_reserva(reserva_data: Dict):
+    reserva_id = create_reserva(reserva_data)
+    return reserva_id
