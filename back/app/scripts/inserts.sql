@@ -1,8 +1,8 @@
 -- Inserir dados na tabela Pessoa
 INSERT INTO Pessoa (cpf, nome, telefone, email, password) VALUES 
-('12345678901', 'João Silva', '11987654321', 'joao.silva@example.com', 'MD5("password123")'),
-('23456789012', 'Maria Oliveira', '21987654321', 'maria.oliveira@example.com', 'MD5("123")'),
-('34567890123', 'Carlos Pereira', '31987654321', 'carlos.pereira@example.com', 'MD5("1234")');
+('12345678901', 'João Silva', '11987654321', 'joao.silva@example.com', MD5('password123')),
+('23456789012', 'Maria Oliveira', '21987654321', 'maria.oliveira@example.com', MD5('123')),
+('34567890123', 'Carlos Pereira', '31987654321', 'carlos.pereira@example.com', MD5('1234'));
 
 -- Inserir dados na tabela Endereco
 INSERT INTO Endereco (endereco, pessoa_cpf, cep, rua, numero, cidade) VALUES 

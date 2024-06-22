@@ -87,7 +87,7 @@ export function Nav() {
                     {
                         auth.email && auth.email.includes('@admin') &&
                         <div className="text-white">
-                            <Link to={"/admin/carros"}>Admin</Link>
+                            <Link to={"/admin/veiculos"}>Admin</Link>
                         </div>
                     }
                     <div className="mr-4">{navList}</div>

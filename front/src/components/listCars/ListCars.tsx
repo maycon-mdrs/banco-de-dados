@@ -1,35 +1,43 @@
 import { CardCar } from '@/components/cardCar/CardCar';
+import { useCategoriaQuery } from '@/hooks/useCategoria';
+import { useVeiculoQuery } from '@/hooks/useVeiculo';
+import { ICategoriaVeiculo, IVeiculo } from '@/interfaces/IVeiculos';
 
 export function ListCars() {
-    const cars = [
-        {
-            image: "https://www.localiza.com/brasil-site/geral/Frota/MOBI.png",
-            title: "Carro 1",
-            description: "Descrição do carro 1",
-        },
-        {
-            image: "https://www.localiza.com/brasil-site/geral/Frota/MOBI.png",
-            title: "Carro 2",
-            description: "Descrição do carro 2",
-        },
-        {
-            image: "https://www.localiza.com/brasil-site/geral/Frota/MOBI.png",
-            title: "Carro 3",
-            description: "Descrição do carro 3",
-        },
-    ];
+    const { data: categorias } = useCategoriaQuery();
+    const { data: veiculos } = useVeiculoQuery();
+
+    if (!categorias || !veiculos) {
+        return null; // Tratamento opcional para dados ainda carregando
+    }
+
+    // Filtrar categorias com base na disponibilidade dos veículos
+    const categoriasDisponiveis = categorias.filter((categoria: ICategoriaVeiculo) => {
+        // Encontrar veículos associados a esta categoria que estão disponíveis
+        const veiculosCategoria = veiculos.filter((veiculo: IVeiculo) => veiculo.categoria_veiculo_tipo_categoria === categoria.tipo_categoria);
+        return veiculosCategoria.some((veiculo: IVeiculo) => veiculo.disponibilidade); // Verificar se algum veículo está disponível
+    });
+
     return (
         <div className='flex flex-wrap justify-between'>
-            {cars.map((car) => (
-                <div key={car.title} className='flex w-full justify-center sm:w-full md:w-1/3 lg:w-1/3 p-2'>
-                    <CardCar
-                        key={car.title+car.description}
-                        image={car.image}
-                        title={car.title}
-                        description={car.description}
-                    />
-                </div>
-            ))}
+            {categoriasDisponiveis.map((categoria: ICategoriaVeiculo, index: number) => {
+                const description = {
+                    preco_dia: categoria.preco_dia,
+                    tipo_categoria: categoria.tipo_veiculo,
+                    quant_passageiros: categoria.quant_passageiros,  
+                    quant_bagagens: categoria.quant_bagagens
+                };
+
+                return (
+                    <div key={index} className='flex w-full justify-center sm:w-full md:w-1/3 lg:w-1/3 p-2'>
+                        <CardCar
+                            image={"https://static.vecteezy.com/ti/vetor-gratis/p3/2099131-super-carro-icone-plano-estilo-elegancia-carro-esporte-conceito-unico-moderno-realista-cartoon-arte-design-generico-luxo-automovel-carro-apresentacao-visao-lateral-ilustracaoial-vetor.jpg"}
+                            title={categoria.tipo_veiculo}
+                            description={description}
+                        />
+                    </div>
+                );
+            })}
         </div>
     );
 }

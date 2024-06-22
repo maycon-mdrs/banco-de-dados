@@ -36,13 +36,23 @@ import { useNavigate } from "react-router-dom";
 interface CarProps {
     image: string;
     title: string;
-    description: string;
+    description: {
+        preco_dia: number,
+        tipo_categoria: string,
+        quant_passageiros: number,
+        quant_bagagens: number
+    };
 }
 
 interface ReservationInfo {
     image: string;
     title: string;
-    description: string;
+    description: {
+        preco_dia: number,
+        tipo_categoria: string,
+        quant_passageiros: number,
+        quant_bagagens: number
+    };
     startDate?: Date;
     endDate?: Date;
     insurance?: boolean;
@@ -235,8 +245,13 @@ export function CardCar(props: CarProps) {
                 <CardTitle>{props.title}</CardTitle>
                 <img src={props.image} alt={"carro"} className="w-auto h-32 object-scale-down" />
             </CardHeader>
-            <CardContent className="flex justify-center text-center">
-                {props.description}
+            <CardContent className="flex flex-col justify-start text-center">
+                <div className="flex flex-row justify-between">
+                    {props.description.preco_dia.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    <div>{props.description.tipo_categoria}</div>
+                </div>
+                <span className="text-start">{props.description.quant_passageiros} passageiros</span>
+                <span className="text-start">{props.description.quant_bagagens} bagagens</span>
             </CardContent>
             <CardFooter className="flex justify-center">
                 <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>

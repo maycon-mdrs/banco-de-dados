@@ -31,27 +31,53 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useCategoriaMutate, useCategoriaQuery } from "@/hooks/useCategoria";
+import { ICategoriaVeiculo, IVeiculo } from "@/interfaces/IVeiculos";
+import { useVeiculoMutate } from "@/hooks/useVeiculo";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 const formSchema = z.object({
-    title: z.string({
-        required_error: "Please enter a name."
-    }).min(1, {
-        message: "Name must be at least 2 characters.",
-    }).max(100, {
-        message: "Name must be at most 100 characters.",
+    codigo: z.string({
+        required_error: "Please enter a code."
+    }).max(7, {
+        message: "Code must be at most 7 characters.",
     }),
-})
+    pais: z.string({
+        required_error: "Please enter a country."
+    }),
+    estado: z.string({
+        required_error: "Please enter a state."
+    }),
+    cidade: z.string({
+        required_error: "Please enter a city."
+    }),
+    categoria_veiculo_tipo_categoria: z.string({
+        required_error: "Please select a category."
+    }),
+});
+
 
 export function NewCar() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { data: categorias } = useCategoriaQuery();
+    const { mutate, isSuccess, isPending } = useVeiculoMutate();
+
     const form = useForm({
         resolver: zodResolver(formSchema),
     })
 
     const onSubmit = async (values: any) => {
-        console.log(values);
-        handleModal()
-    }
+        const parsedValues = {
+            codigo: values.codigo,
+            pais: values.pais,
+            estado: values.estado,
+            cidade: values.cidade,
+            disponibilidade: 1,
+            categoria_veiculo_tipo_categoria: values.categoria_veiculo_tipo_categoria,
+        };
+        console.log('parsedValues: ', parsedValues);
+        mutate(parsedValues);
+    }    
 
     const handleModal = () => {
         setIsModalOpen(prev => !prev);
@@ -59,6 +85,10 @@ export function NewCar() {
             form.reset();
         }
     }
+
+    useEffect(() => {
+        handleModal();
+    }, [isSuccess])
 
     return (
         <Dialog open={isModalOpen} onOpenChange={handleModal}>
@@ -80,7 +110,7 @@ export function NewCar() {
                                 <FormItem>
                                     <FormLabel>Código da placa</FormLabel>
                                     <FormControl>
-                                        <Input {...field} />
+                                        <Input {...field} maxLength={7}/>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -127,7 +157,7 @@ export function NewCar() {
                         />
                         <FormField
                             control={form.control}
-                            name="categoria"
+                            name="categoria_veiculo_tipo_categoria"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Categoria</FormLabel>
@@ -138,16 +168,16 @@ export function NewCar() {
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            {/* {categories?.map((category: ICategory, index) => ( */}
-                                                <SelectItem value={"categoria"}>categoria</SelectItem>
-                                           {/*  ))} */}
+                                            {categorias?.map((categoria: ICategoriaVeiculo, index: any) => (
+                                                <SelectItem key={index} value={categoria.tipo_categoria}>{categoria.tipo_categoria}</SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="w-full">Adicionar</Button>
+                        <Button type="submit" className="w-full">{isPending ? <LoadingSpinner /> : "Adicionar"}</Button>
                     </form>
                 </Form>
             </DialogContent>

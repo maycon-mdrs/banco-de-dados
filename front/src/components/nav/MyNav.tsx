@@ -40,16 +40,16 @@ export function MyNav() {
                 color="blue-gray"
                 className="p-1 font-normal"
             >
-                <Link to={'/admin/carros'} className="flex items-center" onClick={() => setOpenNav(false)}>
-                    Carros
+                <Link to={'/admin/veiculos'} className="flex items-center" onClick={() => setOpenNav(false)}>
+                    Veículos
                 </Link>
             </li>
             <li
                 color="blue-gray"
                 className="p-1 font-normal"
             >
-                <Link to={'/admin/grupo_carros'} className="flex items-center" onClick={() => setOpenNav(false)}>
-                    Grupo de Carros
+                <Link to={'/admin/grupo_veiculos'} className="flex items-center" onClick={() => setOpenNav(false)}>
+                    Grupo de Veículos
                 </Link>
             </li>
             <li
@@ -64,7 +64,7 @@ export function MyNav() {
     );
 
     return (
-        <Navbar ref={navRef} className="sticky top-0 z-10 h-max max-w-full rounded-none px-4 py-2 lg:px-8 lg:py-4 bg-background text-primary " placeholder={undefined}>
+        <Navbar ref={navRef} className="sticky top-0 z-10 h-max max-w-full rounded-none px-4 py-2 lg:px-8 lg:py-4 bg-background text-primary bg-white" placeholder={undefined}>
             <div className={`flex items-center justify-between`}>
                 <div className="flex items-center gap-4">
                     <IconButton
@@ -104,7 +104,7 @@ export function MyNav() {
                         )}
                     </IconButton>
                     <a
-                        href="/admin/carros"
+                        href="/admin/veiculos"
                         className={`mr-4 cursor-pointer py-1.5 font-bold text-xl italic`}
                     >
                         Locadora BD

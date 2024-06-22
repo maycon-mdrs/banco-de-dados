@@ -2,7 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.controllers.pessoa_controller import router as read_pessoa
 from app.controllers.veiculo_controller import router as read_veiculo
+from app.controllers.categoria_controller import router as read_categoria
 from app.controllers.reserva_controller import router as read_reserva
+from app.controllers.preco_controller import router as read_preco
 
 app = FastAPI()
 
@@ -23,4 +25,5 @@ app.add_middleware(
 
 app.include_router(read_pessoa, prefix="/api/v1")
 app.include_router(read_veiculo, prefix="/api/v1")
+app.include_router(read_categoria, prefix="/api/v1")
 app.include_router(read_reserva, prefix="/api/v1")

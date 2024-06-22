@@ -1,5 +1,5 @@
 import { Route, Routes, Navigate } from 'react-router-dom';
-import { PrivateRoutes } from '@/pages/privateRoutes';
+import { PrivateRoutesAdmin } from '@/pages/privateRoutesAdmin';
 
 import { HomePage } from '@/pages/Home/HomePage';
 import { LoginPage } from '@/pages/Login/LoginPage';
@@ -14,18 +14,19 @@ function App() {
 
   return (
     <Routes>
-      {/* <Route element={<PrivateRoutes />}>
-        <Route path="*" element={<Navigate to="/home" />} />
-        <Route path='/home' element={<HomePage />} />
-      </Route> */}
+      <Route element={<PrivateRoutesAdmin />}>
+        <Route path="*" element={<Navigate to="/admin/veiculos" />} />
+        <Route path='/admin/veiculos' element={<AdminPage />} />
+        <Route path='/admin/grupo_veiculos' element={<GrupoCarrosPage />} />
+        <Route path='/admin/reservas' element={<ReservaPage />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/home" />} />
       <Route path='/home' element={<HomePage />} />
       <Route path='/login' element={<LoginPage />} />
       <Route path='/cadastro' element={<CadastroPage />} />
       <Route path='/locacao' element={<LocacaoPage />} />
       <Route path='/minhas_locacoes' element={<MyLocacao />} />
-      <Route path='/admin/carros' element={<AdminPage />} />
-      <Route path='/admin/grupo_carros' element={<GrupoCarrosPage />} />
-      <Route path='/admin/reservas' element={<ReservaPage />} />
+
     </Routes>
   )
 }

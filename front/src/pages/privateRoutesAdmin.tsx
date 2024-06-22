@@ -6,7 +6,7 @@ import { useAuth } from "@/context/AuthProvider/useAuth";
  * Se o usuário estiver autenticado (possuir um email que contém "@admin"), permite o acesso às rotas aninhadas (Outlet),
  * caso contrário, redireciona para a página de login.
  */
-export function PrivateRoutes () {
+export function PrivateRoutesAdmin () {
     const auth = useAuth();
 
     return auth.email && auth.email.includes('@admin') ? <Outlet/> : <Navigate to='/login'/>; 
