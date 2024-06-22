@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { format } from "date-fns";
+import { differenceInDays, format } from "date-fns";
 import { ptBR } from 'date-fns/locale';
 import {
     Dialog,
@@ -25,12 +25,18 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Flex, Progress } from 'antd';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox"
 import { useNavigate } from "react-router-dom";
+import { IReserva, IReservaCreate } from "@/interfaces/IReserva";
+import { useReservaMutation } from "@/hooks/useReserva";
+import { useAuth } from "@/context/AuthProvider/useAuth";
+import { useVeiculoQuery } from "@/hooks/useVeiculo";
+import { ICategoriaVeiculo, IVeiculo } from "@/interfaces/IVeiculos";
+import { useCategoriaQuery } from "@/hooks/useCategoria";
 
 
 interface CarProps {
@@ -38,7 +44,7 @@ interface CarProps {
     title: string;
     description: {
         preco_dia: number,
-        tipo_categoria: string,
+        tipo_veiculo: string,
         quant_passageiros: number,
         quant_bagagens: number
     };
@@ -49,7 +55,7 @@ interface ReservationInfo {
     title: string;
     description: {
         preco_dia: number,
-        tipo_categoria: string,
+        tipo_veiculo: string,
         quant_passageiros: number,
         quant_bagagens: number
     };
@@ -60,6 +66,11 @@ interface ReservationInfo {
 }
 
 export function CardCar(props: CarProps) {
+    const { mutate } = useReservaMutation();
+    const { data: categorias } = useCategoriaQuery();
+    const { data: veiculos } = useVeiculoQuery();
+
+    const auth = useAuth();
     const [dialogOpen, setDialogOpen] = useState(false);
     const [progress, setProgress] = useState(33); // Initial progress for 3 stages
     const [currentStage, setCurrentStage] = useState(1);
@@ -110,23 +121,56 @@ export function CardCar(props: CarProps) {
         setEndCalendarOpen(false);
     };
 
-    const handleReservation = () => {
-        const reservationInfo: ReservationInfo = {
-            image: props.image,
-            title: props.title,
-            description: props.description,
-            startDate: startDate,
-            endDate: endDate,
-            insurance: insuranceChecked,
-            paymentMethod: paymentMethod,
+    const handleReservation = async () => {
+        // Encontra a categoria selecionada pelo usuário
+        const categoriaSelecionada = categorias?.find((categoria: ICategoriaVeiculo) => categoria.tipo_categoria === props.title);
+
+        if (!categoriaSelecionada) {
+            console.error("Categoria selecionada não encontrada.");
+            return;
+        }
+
+        // Encontra o primeiro veículo disponível na categoria selecionada
+        const veiculoSelecionado = veiculos?.find((veiculo: IVeiculo) => veiculo.categoria_veiculo_tipo_categoria === categoriaSelecionada.tipo_categoria);
+
+        if (!veiculoSelecionado) {
+            console.error(`Nenhum veículo disponível na categoria ${categoriaSelecionada.tipo_categoria} encontrado.`);
+            return;
+        }
+
+        const reservaData: IReservaCreate = {
+            data_hora_retirada: format(startDate!, "yyyy-MM-dd'T'HH:mm:ss"),
+            data_hora_devolucao: format(endDate!, "yyyy-MM-dd'T'HH:mm:ss"),
+            status: "Pendente",
+            tem_motorista: 0,
+            veiculo_codigo: veiculoSelecionado.codigo,
+            motorista_funcionario_pessoa_cpf: null,
+            locatario_pessoa_cpf: auth.cpf,
         };
-        console.log("Reservation Info: ", reservationInfo);
-        // Handle the reservation process, e.g., sending data to the server
-        navigate("/minhas_locacoes");
-        setDialogOpen(false);
+
+        console.log("Criando reserva com os dados:", reservaData);
+
+        mutate(reservaData, {
+            onSuccess: () => {
+                navigate("/minhas_locacoes");
+                setDialogOpen(false);
+                resetForm();
+            },
+            onError: (error) => {
+                console.error("Erro ao criar reserva:", error);
+            }
+        });
     };
 
     const renderStageContent = () => {
+        const calcularValorTotal = () => {
+            if (startDate && endDate) {
+                const dias = differenceInDays(endDate, startDate); // Calcula a diferença em dias entre as datas
+                const valorTotal = props.description.preco_dia * dias; // Calcula o valor total multiplicando o preço por dia pelos dias de locação
+                return valorTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); // Formata o valor como moeda brasileira
+            }
+            return "Escolha as datas"; // Mensagem padrão se as datas não estiverem definidas
+        };
         switch (currentStage) {
             case 1:
                 return (
@@ -205,7 +249,7 @@ export function CardCar(props: CarProps) {
                                 htmlFor="terms"
                                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                             >
-                                Accept terms and conditions
+                                Seguro (R$ 10/dia)
                             </label>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -214,24 +258,31 @@ export function CardCar(props: CarProps) {
                                 htmlFor="terms"
                                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                             >
-                                Accept terms and conditions
+                                Quero um motorista
+                            </label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <Checkbox id="terms" />
+                            <label
+                                htmlFor="terms"
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                                Aceitar termos e condições
                             </label>
                         </div>
                         {/* Show updated reservation value */}
                         <div className="flex flex-col gap-2">
                             <Label>Valor da Reserva</Label>
-                            <div>R$ XXX,XX</div>
+                            <div>{calcularValorTotal()}</div>
                         </div>
                     </div >
                 );
             case 3:
                 return (
                     <div className="grid gap-4 py-4">
-                        {/* Payment method */}
-                        <div className="flex flex-col gap-2">
-                            <Label htmlFor="payment">Método de Pagamento</Label>
-                            <Input type="text" id="payment" name="payment" placeholder="Número do Cartão" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} />
-                        </div>
+                        <p className="text-sm text-gray-600 mb-4">
+                            Você receberá por email os métodos de pagamento disponíveis para confirmar a reserva.
+                        </p>
                     </div>
                 );
             default:
@@ -248,7 +299,7 @@ export function CardCar(props: CarProps) {
             <CardContent className="flex flex-col justify-start text-center">
                 <div className="flex flex-row justify-between">
                     {props.description.preco_dia.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                    <div>{props.description.tipo_categoria}</div>
+                    <div>{props.description.tipo_veiculo}</div>
                 </div>
                 <span className="text-start">{props.description.quant_passageiros} passageiros</span>
                 <span className="text-start">{props.description.quant_bagagens} bagagens</span>

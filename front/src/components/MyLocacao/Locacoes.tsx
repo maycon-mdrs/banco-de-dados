@@ -20,8 +20,8 @@ export function Locacoes() {
         return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     };
 
-    const formatDate = (dateString: string) => {
-        return format(new Date(dateString), 'dd/MM/yyyy HH:mm');
+    const formatDate = (dateString: string | Date) => {
+        return format(new Date(dateString.toString()), 'dd/MM/yyyy HH:mm');
     };
 
     const calculateMulta = (reserva: IReserva) => {

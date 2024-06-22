@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export function useCategoriaQuery() {
     return useQuery({
-        queryFn: () => get_all_categorias(),
+        queryFn: get_all_categorias,
         queryKey: ['categorias-data'],
     });
 }

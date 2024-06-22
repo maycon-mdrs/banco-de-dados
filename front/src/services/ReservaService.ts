@@ -1,5 +1,5 @@
 import { Api } from '@/services/api';
-import { IReserva } from '@/interfaces/IReserva';
+import { IReserva, IReservaCreate } from '@/interfaces/IReserva';
 
 export async function get_reserva(id: number) {
     try {
@@ -31,9 +31,10 @@ export async function get_all_reservas() {
     }
 }
 
-export async function create_reserva(data: IReserva) {
+export async function create_reserva(data: IReservaCreate): Promise<IReserva | null>{
     try {
         const request = await Api.post('/reservas', data);
+        console.log(request.data)
         return request.data;
     } catch (error) {
         console.error(error);

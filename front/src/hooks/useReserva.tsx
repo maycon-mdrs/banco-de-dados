@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export function useAllReservaQuery() {
     return useQuery({
-        queryFn: () => get_all_reservas(),
+        queryFn: get_all_reservas,
         queryKey: ['reserva-data'],
     });
 }
@@ -11,11 +11,11 @@ export function useAllReservaQuery() {
 export function useReservaByCpfQuery(cpf: string) {
     return useQuery({
         queryFn: () => get_reservas_por_pessoa(cpf),
-        queryKey: ['reserva-data'],
+        queryKey: ['reserva-data-cpf'],
     });
 }
 
-export function useCategoriaMutate() {
+export function useReservaMutation() {
     const queryClient = useQueryClient();
     const mutate = useMutation({
         mutationFn: create_reserva,

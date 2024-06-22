@@ -189,26 +189,35 @@ class ReservaService:
             cursor.execute(query, (reserva.veiculo_codigo,))
             veiculo_info = cursor.fetchone()
             
-            if not veiculo_info or veiculo_info['disponibilidade'] == 0:
+            if not veiculo_info:
+                print("Veículo não encontrado")
+                raise Exception("Veículo não encontrado")
+            
+            if veiculo_info['disponibilidade'] == 0:
                 print("Veículo não disponível")
                 raise Exception("Veículo não disponível")
             
             # Calcular o valor total da reserva
             dias_reserva = (reserva.data_hora_devolucao - reserva.data_hora_retirada).days
+            if dias_reserva <= 0:
+                print("Datas de retirada e devolução inválidas")
+                raise Exception("Datas de retirada e devolução inválidas")
+            
             valor_total = dias_reserva * veiculo_info['preco_dia']
             
             # Inserir reserva
             insert_query = """
                 INSERT INTO Reserva (valor_multa, valor_seguro, valor_categoria, valor_desconto,
-                                     data_hora_retirada, data_hora_devolucao, data_hora_devolucao_efetiva, status, tem_motorista,
-                                     veiculo_codigo, motorista_funcionario_pessoa_cpf, locatario_pessoa_cpf)
+                                    data_hora_retirada, data_hora_devolucao, data_hora_devolucao_efetiva, status, tem_motorista,
+                                    veiculo_codigo, motorista_funcionario_pessoa_cpf, locatario_pessoa_cpf)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
             cursor.execute(insert_query, (0, 0, valor_total, 0, reserva.data_hora_retirada,
-                                          reserva.data_hora_devolucao, None, reserva.status,
-                                          reserva.tem_motorista, reserva.veiculo_codigo,
-                                          reserva.motorista_funcionario_pessoa_cpf,
-                                          reserva.locatario_pessoa_cpf))
+                                        reserva.data_hora_devolucao, None, reserva.status,
+                                        reserva.tem_motorista, reserva.veiculo_codigo,
+                                        reserva.motorista_funcionario_pessoa_cpf,
+                                        reserva.locatario_pessoa_cpf))
+            reserva_id = cursor.lastrowid
             conn.commit()
             
             # Atualizar disponibilidade do veículo
@@ -218,11 +227,12 @@ class ReservaService:
             cursor.execute(update_query, (reserva.veiculo_codigo,))
             conn.commit()
             
+            # Retornar a reserva criada
             cursor.close()
             conn.close()
             
-            # Retornar a reserva criada
-            return self.get_reserva_by_id(cursor.lastrowid)
+            print(f"Reserva criada com sucesso, ID: {reserva_id}")
+            return self.get_reserva_by_id(reserva_id)
         
         except Exception as e:
             print(f"Error creating reserva: {str(e)}")

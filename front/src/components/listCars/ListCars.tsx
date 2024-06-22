@@ -15,7 +15,7 @@ export function ListCars() {
     const categoriasDisponiveis = categorias.filter((categoria: ICategoriaVeiculo) => {
         // Encontrar veículos associados a esta categoria que estão disponíveis
         const veiculosCategoria = veiculos.filter((veiculo: IVeiculo) => veiculo.categoria_veiculo_tipo_categoria === categoria.tipo_categoria);
-        return veiculosCategoria.some((veiculo: IVeiculo) => veiculo.disponibilidade); // Verificar se algum veículo está disponível
+        return veiculosCategoria.some((veiculo: IVeiculo) => veiculo.disponibilidade === 1); // Verificar se algum veículo está disponível
     });
 
     return (
@@ -23,7 +23,7 @@ export function ListCars() {
             {categoriasDisponiveis.map((categoria: ICategoriaVeiculo, index: number) => {
                 const description = {
                     preco_dia: categoria.preco_dia,
-                    tipo_categoria: categoria.tipo_veiculo,
+                    tipo_veiculo: categoria.tipo_veiculo,
                     quant_passageiros: categoria.quant_passageiros,  
                     quant_bagagens: categoria.quant_bagagens
                 };
@@ -32,7 +32,7 @@ export function ListCars() {
                     <div key={index} className='flex w-full justify-center sm:w-full md:w-1/3 lg:w-1/3 p-2'>
                         <CardCar
                             image={"https://static.vecteezy.com/ti/vetor-gratis/p3/2099131-super-carro-icone-plano-estilo-elegancia-carro-esporte-conceito-unico-moderno-realista-cartoon-arte-design-generico-luxo-automovel-carro-apresentacao-visao-lateral-ilustracaoial-vetor.jpg"}
-                            title={categoria.tipo_veiculo}
+                            title={categoria.tipo_categoria}
                             description={description}
                         />
                     </div>

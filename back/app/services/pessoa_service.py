@@ -26,16 +26,35 @@ def cadastrar_pessoa(pessoa: Pessoa) -> PessoaDTO:
     try:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
-        query = "INSERT INTO Pessoa (cpf, nome, telefone, email, password) VALUES (%s, %s, %s, %s, MD5(%s))"
-        cursor.execute(query, (pessoa.cpf, pessoa.nome, pessoa.telefone, pessoa.email, pessoa.password))
+        
+        # Inserir pessoa
+        query_pessoa = """
+            INSERT INTO Pessoa (cpf, nome, telefone, email, password) 
+            VALUES (%s, %s, %s, %s, MD5(%s))
+        """
+        cursor.execute(query_pessoa, (pessoa.cpf, pessoa.nome, pessoa.telefone, pessoa.email, pessoa.password))
+        
+        # Inserir locatário
+        query_locatario = """
+            INSERT INTO Locatario (pessoa_cpf) 
+            VALUES (%s)
+        """
+        cursor.execute(query_locatario, (pessoa.cpf,))
+        
+        # Commitar as transações
         conn.commit()
+        
+        # Fechar cursor e conexão
         cursor.close()
         conn.close()
 
-        return {"cpf": pessoa.cpf, "nome": pessoa.nome, "telefone": pessoa.telefone, "email": pessoa.email}
+        # Retornar DTO da pessoa
+        return PessoaDTO(cpf=pessoa.cpf, nome=pessoa.nome, telefone=pessoa.telefone, email=pessoa.email)
+    
     except Exception as e:
         # Handle the exception here
         print(f"An error occurred: {str(e)}")
+        return None  # ou lançar uma exceção apropriada
 
 def login_service(email: str, password: str) -> PessoaDTO:
     try:
