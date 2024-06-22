@@ -14,7 +14,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, InputProps>(
 		const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
 		return (
-			<div className="relative">
+			<div className="relative w-full">
 				<Input
 					type={showPassword ? "text" : "password"}
 					className={cn("hide-password-toggle pr-10", className)}

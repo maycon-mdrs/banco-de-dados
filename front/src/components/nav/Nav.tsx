@@ -4,6 +4,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { cn } from "@/lib/utils";
+import { MdOutlineLogout } from "react-icons/md";
 
 import { MdPerson } from "react-icons/md";
 import { Link } from "react-router-dom";
@@ -51,7 +52,9 @@ export function Nav() {
                 {auth.email ?
                     (<>
                         <MdPerson size={24} />
-                        <div>{auth.email}</div>
+                        <div style={{ marginLeft: 0 }}>{auth.email}</div>
+                        <Separator orientation="vertical" className="bg-white" />
+                        <Link to={"/login"} onClick={() => auth.logout()}><MdOutlineLogout size={24} /></Link>
                     </>) :
                     (<>
                         <MdPerson size={24} />
@@ -68,8 +71,25 @@ export function Nav() {
             <div className="sticky top-0 z-10 h-max max-w-full px-4 py-2 bg-background text-primary bg-indigo-500 rounded-t-md">
                 <div className={`flex items-center justify-between`}>
                     <div className="flex items-center gap-4 text-white">
-                        Locadora BD
+                        <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
+                            <Link to={"/home"}>Locadora BD</Link>
+                        </h3>
                     </div>
+                    <div className="text-white">
+                        <Link to={"/home"}>Veículos</Link>
+                    </div>
+                    {
+                        auth.email &&
+                        <div className="text-white">
+                            <Link to={"/minhas_locacoes"}>Minhas Locações</Link>
+                        </div>
+                    }
+                    {
+                        auth.email && auth.email.includes('@admin') &&
+                        <div className="text-white">
+                            <Link to={"/admin/carros"}>Admin</Link>
+                        </div>
+                    }
                     <div className="mr-4">{navList}</div>
                 </div>
             </div>

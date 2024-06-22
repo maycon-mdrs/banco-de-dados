@@ -1,5 +1,6 @@
 import { Api } from "@/services/api";
 import { IUser } from "./types";
+import { IRegister } from "@/interfaces/IUser";
 
 /**
  * Armazena os detalhes do usuário no localStorage.
@@ -39,9 +40,10 @@ export async function LoginRequest (email: string, password: string) {
     }
 }
 
-export async function RegisterRequest ({ email, password }: { email: string, password: string }) {
+export async function RegisterRequest ({ cpf, nome, telefone, email, password }: IRegister) {
     try {
-        const request = await Api.post("register", { email, password });
+        console.log({ cpf, nome, telefone, email, password })
+        const request = await Api.post("cadastro_usuario", { cpf, nome, telefone, email, password });
         console.log('request.data: ', request.status);
     } catch (error) {
         throw error;

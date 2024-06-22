@@ -5,7 +5,7 @@ import { message } from "antd";
  * Criação de uma instância do Axios para realizar requisições à API.
  */
 export const Api = axios.create({
-    baseURL: "http://127.0.0.1:8000/api/",
+    baseURL: "http://127.0.0.1:8000/api/v1/",
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',

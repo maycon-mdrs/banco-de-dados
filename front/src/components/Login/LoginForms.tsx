@@ -10,26 +10,60 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { PasswordInput } from "@/components/ui/password-input"
-import { useState } from "react"
-import { Form, Spin } from "antd"
-import { LoadingOutlined } from '@ant-design/icons';
+import { useEffect } from "react"
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
+import { Form, FormField, FormLabel, FormItem, FormControl, FormMessage } from "@/components/ui/form";
+import { Alert, message } from 'antd';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { useLoginMutate } from "@/hooks/useLogin"
+import { useNavigate } from "react-router-dom"
+import { ILogin } from "@/interfaces/IUser"
+
+
+const formSchema = z.object({
+    email: z.string({
+        required_error: "Please enter an email.",
+    }).email({
+        message: "Please enter a valid email address.",
+    }),
+    password: z.string({
+        required_error: "Please enter a password.",
+    }).min(1, {
+        message: "Password must be at least 1 character.",
+    }).max(100, {
+        message: "Password must be at most 100 characters.",
+    }),
+})
 
 export function LoginForms() {
-    const [password, setPassword] = useState("")
-    const [loading, setLoading] = useState(false)
+    const { mutate, isSuccess, isPending, isError } = useLoginMutate();
+    const navigate = useNavigate();
 
-    const loadingIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+    const form = useForm({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            email: "",
+            password: ""
+        }
+    });
 
-    async function onFinish(values: { email: string, password: string }) {
-        setLoading(true)
-        console.log('Success:', values);
-        setLoading(false)
-    };
+    const onSubmit = async (values: ILogin) => {
+        const loginData: ILogin = {
+            email: values.email,
+            password: values.password,
+        }
+        mutate(loginData);
+    }
 
-    const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
-    };
+    useEffect(() => {
+        if (isSuccess) {
+            navigate('/home');
+            message.success('Successful login!');
+        }
+    }, [isSuccess]);
 
     return (
         <Card>
@@ -39,62 +73,54 @@ export function LoginForms() {
                     Para realizar as reservas dos veículos, é necessário que faça o login!
                 </CardDescription>
             </CardHeader>
-            <Form
-                name="login-form"
-                onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
-            >
+            <Form {...form}>
+                {
+                    isError &&
+                    <Alert
+                        message="Email ou password incorreto!"
+                        showIcon
+                        className="mb-5 mx-5"
+                        type="error"
+                        closable
+                    />
+                }
                 <CardContent className="space-y-2">
 
-                    {/* EMAIL */}
-                    <Form.Item
-                        name="email-login"
-                        rules={[
-                            {
-                                type: 'email',
-                                message: 'Por favor, inserir um e-mail válido!'
-                            },
-                            {
-                                required: true,
-                                message: 'Por favor, inserir seu e-mail!'
-                            }
-                        ]}
-                        validateTrigger="onBlur"
-                        className="text-primary m-0"
+                    <form onSubmit={form.handleSubmit(onSubmit)}
+                        className="flex flex-col gap-6"
                     >
-                        <div className="space-y-1">
-                            <Label htmlFor="email-login">E-mail</Label>
-                            <Input id="email-login" />
-                        </div>
-                    </Form.Item>
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-col items-start">
+                                    <FormLabel>E-mail</FormLabel>
+                                    <FormControl>
+                                        <Input {...field} placeholder="@gmail.com" autoComplete="true" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-col items-start">
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                        <PasswordInput {...field} placeholder="***********" type="password" autoComplete="true" />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
 
-                    {/* SENHA */}
-                    <Form.Item
-                        name="password"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Por favor, inserir sua senha!'
-                            }
-                        ]}
-                        className="text-primary"
-                    >
-                        <div className="space-y-1">
-                            <Label htmlFor="password">Senha</Label>
-                            <PasswordInput
-                                id="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-                    </Form.Item>
+                        <Button type="submit" >
+                            {isPending ? <LoadingSpinner /> : "Entrar"}
+                        </Button>
+                    </form>
                 </CardContent>
-
-                <CardFooter>
-                    <Button type="submit" className="w-full" >
-                        {loading ? loadingIcon : 'Entrar'}
-                    </Button>
-                </CardFooter>
             </Form>
         </Card>
     );

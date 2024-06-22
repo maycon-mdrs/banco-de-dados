@@ -4,7 +4,7 @@ dbconfig = {
     "user": "root",
     "password": "root",
     "host": "localhost",
-    "database": "projetodb"
+    "database": "projetct"
 }
 
 connection_pool = pooling.MySQLConnectionPool(pool_name="mypool",

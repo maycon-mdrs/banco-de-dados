@@ -1,6 +1,8 @@
 export interface IUser {
+    cpf?: string;
+    name?: string;
+    telefone?: string;
     email?: string;
-    token?: string;
 }
 
 /**
