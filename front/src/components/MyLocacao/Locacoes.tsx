@@ -30,10 +30,14 @@ export function Locacoes() {
             ? new Date(reserva.data_hora_devolucao_efetiva)
             : new Date();
 
+        const now = new Date();
         const hoursLate = differenceInHours(dataDevolucaoEfetiva, dataDevolucao);
         const multa = reserva.valor_multa || 0;
 
-        return multa * Math.max(0, hoursLate);
+        const isLate = now > dataDevolucao;
+        const multaEfetiva = isLate ? multa * Math.max(0, hoursLate) : 0;
+
+        return multaEfetiva;
     };
 
     const calculateTotal = (reserva: IReserva) => {
@@ -42,8 +46,8 @@ export function Locacoes() {
         const seguro = reserva.valor_seguro || 0;
         const desconto = reserva.valor_desconto || 0;
 
-        const dataRetirada = new Date(reserva.data_hora_retirada!);
-        const dataDevolucao = new Date(reserva.data_hora_devolucao!);
+        const dataRetirada = reserva.data_hora_retirada!;
+        const dataDevolucao = reserva.data_hora_devolucao!;
 
         const days = differenceInDays(dataDevolucao, dataRetirada);
 

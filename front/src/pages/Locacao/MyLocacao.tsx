@@ -8,13 +8,6 @@ interface Reservation {
 }
 
 export function MyLocacao() {
-    const [reservations, setReservations] = useState<Reservation[]>([]);
-
-    useEffect(() => {
-        const storedReservations = JSON.parse(localStorage.getItem("reservations") || "") || [];
-        setReservations(storedReservations);
-    }, []);
-
     return (
         <main className="flex flex-col max-w-5xl mx-auto">
             <Nav />
