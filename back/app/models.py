@@ -69,7 +69,7 @@ class SeguroLocacao(BaseModel):
     codigo_seguro: int # pk NN
     descricao: str # NN
     tipo_seguro: str # NN
-    valor_dia: str # NN
+    valor_dia: float # NN
     locatario_pessoa_cpf: str = Field(..., foreign_key="Locatario.pessoa_cpf") # pode ser null
 
 class SeguroLocacao_has_Reserva(BaseModel):
@@ -78,7 +78,7 @@ class SeguroLocacao_has_Reserva(BaseModel):
 
 class Plano(BaseModel):
     id_plano: int # pk NN
-    valor: str # NN
+    valor: float # NN
     locatario_pessoa_cpf: str = Field(..., foreign_key="Locatario.pessoa_cpf") # pk NN
 
 class Beneficio(BaseModel):

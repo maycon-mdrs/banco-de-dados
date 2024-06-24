@@ -5,6 +5,8 @@ from app.controllers.veiculo_controller import router as read_veiculo
 from app.controllers.categoria_controller import router as read_categoria
 from app.controllers.reserva_controller import router as read_reserva
 from app.controllers.preco_controller import router as read_preco
+from app.controllers.beneficio_controller import router as read_beneficio
+from app.controllers.plano_controller import router as read_plano
 
 app = FastAPI()
 
@@ -27,3 +29,5 @@ app.include_router(read_pessoa, prefix="/api/v1")
 app.include_router(read_veiculo, prefix="/api/v1")
 app.include_router(read_categoria, prefix="/api/v1")
 app.include_router(read_reserva, prefix="/api/v1")
+app.include_router(read_beneficio, prefix="/api/v1")
+app.include_router(read_plano, prefix="/api/v1")

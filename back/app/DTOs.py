@@ -72,3 +72,25 @@ class PrecoDTO(BaseModel):
     data: datetime
     multa_hora: float
     preco_dia: float
+
+class PlanoDTO(BaseModel):
+    valor: float
+    locatario_pessoa_cpf: str
+
+    class Config:
+        orm_mode = True
+
+class PlanoCreateDTO(BaseModel):
+    valor: float
+    locatario_pessoa_cpf: str
+
+class BeneficioDTO(BaseModel):
+    beneficio: str
+    plano_id_plano: int
+
+    class Config:
+        orm_mode = True
+
+class BeneficioCreateDTO(BaseModel):
+    beneficio: str
+    plano_id_plano: int
